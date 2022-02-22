@@ -1,0 +1,46 @@
+name: "Test GAP" 
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    name: "GAP ${{ matrix.container }} / ${{ matrix.test-suite }} / ${{ matrix.pkgs }} packages"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-18.04
+        test-suite:
+          - testinstall
+          - testbugfix
+          - teststandard
+        pkgs:
+          - no
+          - auto
+          - all
+        container:
+          - master
+          - stable-4.11
+          - stable-4.10
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Constructing the full Docker container URL"
+        id: container
+        run: |
+          echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ matrix.container }}:master"
+
+      - name: "Pull the container ${{ steps.container.outputs.url }}"
+        run: |
+          docker version
+          docker pull ${{ steps.container.outputs.url }}
+
+      - name: "Run GAP's ${{ matrix.test-suite }} test suite in the container"
+        run: |
+          docker run -v $PWD:/home/travis/gap ${{ steps.container.outputs.url }} /bin/sh -c "TEST_SUITE=${{ matrix.test-suite }} GAPPKG=${{ matrix.pkgs }} CONTAINER=${{ matrix.container }} /home/travis/gap/gap-ci.sh"
+          # retired variables: TERM=dumb LANG=en_GB.UTF-8
