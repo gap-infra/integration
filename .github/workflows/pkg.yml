@@ -15,10 +15,10 @@ jobs:
         gap-container:
           - master
           - stable-4.11
-          #- stable-4.10
         pkg:
           - ace
           - aclib
+          - agt
           - alnuth
           - anupq
           - atlasrep
@@ -65,7 +65,7 @@ jobs:
           - grpconst
           - guarana
           - guava
-            #- hap TIMES OUT
+          - hap
           - hapcryst
           - hecke
           - help
@@ -102,7 +102,7 @@ jobs:
           - patternclass
           - permut
           - polenta
-            #- polycyclic TIMES OUT
+          - polycyclic
           - polymaking
           - primgrp
           - profiling
@@ -150,5 +150,6 @@ jobs:
           docker version
           docker pull ghcr.io/gap-system/gap-docker-${{ matrix.gap-container }}:master
       - name: "Run tests in Docker container"
+        timeout-minutes: 20
         run: |
           docker run -v $PWD:/home/workspace ghcr.io/gap-system/gap-docker-${{ matrix.gap-container }}:master /bin/sh -c "PKG_NAME=${{ matrix.pkg }} TERM=xterm LANG=en_GB.UTF-8 /home/workspace/pkg-ci.sh"
