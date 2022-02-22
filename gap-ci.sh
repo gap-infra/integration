@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Test a GAP test suite
+
 set -ex
 
 TERM=${TERM:-dumb}

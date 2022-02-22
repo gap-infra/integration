@@ -1,0 +1,156 @@
+name: pkg-tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    name: GAP ${{ matrix.gap-container }} / ${{ matrix.pkg }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-18.04
+        gap-container:
+          - master
+          - stable-4.11
+          #- stable-4.10
+        pkg:
+          - ace
+          - aclib
+          - alnuth
+          - anupq
+          - atlasrep
+          - autodoc
+          - automata
+          - automgrp
+          - autpgrp
+          - caratinterface
+          - cddinterface
+          - circle
+          - cohomolo
+          - congruence
+          - crime
+          - crisp
+          - crypting
+          - cryst
+          - crystcat
+          - ctbllib
+          - cubefree
+          - curlinterface
+          - cvec
+          - datastructures
+          - deepthought
+          - design
+          - difsets
+          - digraphs
+          - edim
+          - example
+          - factint
+          - ferret
+          - fga
+          - fining
+          - float
+          - format
+          - forms
+          - fplsa
+          - fr
+          - francy
+          - fwtree
+          - gbnp
+          - genss
+          - grape
+          - groupoids
+          - grpconst
+          - guarana
+          - guava
+          - hap
+          - hapcryst
+          - hecke
+          - help
+          - idrel
+          - images
+          - intpic
+          - io
+          - irredsol
+          - json
+          - jupyterkernel
+          - jupyterviz
+          - kan
+          - kbmag
+          - laguna
+          - liealgdb
+          - liepring
+          - liering
+          - loops
+          - lpres
+          - majoranaalgebras
+          - mapclass
+          - matgrp
+          - modisom
+          - monoidalcategories
+          - nconvex
+          - nilmat
+          - nock
+          - normalizinterface
+          - nq
+          - numericalsgps
+          - openmath
+          - orb
+          - packagemanager
+          - patternclass
+          - permut
+          - polenta
+          - polycyclic
+          - polymaking
+          - primgrp
+          - profiling
+          - qpa
+          - quagroup
+          - radiroot
+          - rcwa
+          - rds
+          - recog
+          - repndecomp
+          - repsn
+          - resclasses
+          - scscp
+          - semigroups
+          - sglppow
+          - sgpviz
+          - simpcomp
+          - singular
+          - sla
+          - smallgrp
+          - smallsemi
+          - sonata
+          - sophus
+          - spinsym
+          - symbcompcc
+          - thelma
+          - tomlib
+          - toric
+          - transgrp
+          - unipot
+          - unitlib
+          - utils
+          - uuid
+          - walrus
+          - wedderga
+          - xmod
+          - xmodalg
+          - yangbaxter
+          - zeromqinterface
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Pull Docker container gap-system/gap-docker-${{ matrix.gap-container }}:master"
+        run: |
+          docker version
+          docker pull ghcr.io/gap-system/gap-docker-${{ matrix.gap-container }}:master
+      - name: "Run tests in Docker container"
+        run: |
+          docker run -v $PWD:/home/workspace ghcr.io/gap-system/gap-docker-${{ matrix.gap-container }}:master /bin/sh -c "PKG_NAME=${{ matrix.pkg }} TERM=xterm LANG=en_GB.UTF-8 /home/workspace/pkg-ci.sh"

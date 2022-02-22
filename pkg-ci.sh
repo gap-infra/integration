@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 
-# running GAP tests suite
+# Test a GAP package individually
 
 set -e
 
-SRCDIR=${SRCDIR:-$PWD}
-
-echo SRCDIR   : $SRCDIR
 echo PKG_NAME : $PKG_NAME
 
 cd ${GAP_HOME}
@@ -97,7 +94,7 @@ if [ "${PASS1}" != 'PASS' ] || [ "${PASS2}" != 'PASS' ] || [ "${PASSA}" != 'PASS
 then
   echo "######################################################################\n"
   echo ""
-  cat /home/gap/travis/HELP.md
+  cat /home/workspace/HELP.md
   echo "######################################################################"
   echo ""
   exit 1
