@@ -1,0 +1,54 @@
+name: "Run a package test suite"
+
+on:
+  workflow_call:
+    inputs:
+      container:
+        required: true
+        type: string
+
+jobs:
+  extract:
+    name: "Get package names"
+    runs-on: ubuntu-latest
+    container: ghcr.io/gap-system/gap-docker-${{ inputs.container }}:master
+    outputs:
+      matrix: ${{ steps.get-names.outputs.matrix }}
+      container: ${{ inputs.container }}
+    steps:
+      # FIXME: Awful! This should be completely redone to use the package distro
+      - name: "Get the list of package names"
+        id: get-names
+        run: |
+          cd ${GAP_HOME}/pkg
+          MATRIX='{"package":['
+          for PKG in `ls */PackageInfo.g | cut -d'/' -f1 | cut -d'-' -f1 | tr '[:upper:]' '[:lower:]' | sort`; do
+            echo "${PKG}"
+            MATRIX="${MATRIX}\"${PKG}\","
+          done
+          MATRIX="${MATRIX}]}"
+          echo "::set-output name=matrix::$MATRIX"
+
+  individual-package:
+    name: "${{ matrix.package }}"
+    needs: extract
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.extract.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Get the Docker container URL"
+        id: container
+        run: echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ needs.extract.outputs.container }}:master"
+
+      - run: docker pull ${{ steps.container.outputs.url }}
+
+      - name: "Run ${{ matrix.package }}'s tests in the container with GAP ${{ needs.extract.outputs.container }}"
+        timeout-minutes: 20
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ${{ steps.container.outputs.url }}
+          /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh"

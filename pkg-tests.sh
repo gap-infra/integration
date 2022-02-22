@@ -4,6 +4,8 @@
 
 set -e
 
+TERM=${TERM:-xterm}
+
 echo PKG_NAME : $PKG_NAME
 
 cd ${GAP_HOME}

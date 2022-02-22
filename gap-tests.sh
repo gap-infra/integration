@@ -12,10 +12,8 @@ GAP="${GAPauto} -A"
 
 echo TEST_SUITE: $TEST_SUITE
 echo GAPPKG    : $GAPPKG
-echo CONTAINER : $CONTAINER
 
-# FIXME: Perhaps containers should be installed in the same directory?
-cd /home/gap/inst/gap-${CONTAINER}/
+cd ${GAP_HOME}
 
 case $TEST_SUITE in
 

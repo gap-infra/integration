@@ -1,0 +1,29 @@
+name: "GAP master test suites"
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install-bugfix-standard:
+    name: "GAP"
+    uses: ./.github/workflows/gap-tests.yml
+    with:
+      container: >-
+        ["master"]
+      suite: >-
+        ["testinstall", "testbugfix", "teststandard"]
+      pkgs: >-
+        ["no", "auto", "all"]
+
+  loadpackages:
+    name: "GAP"
+    uses: ./.github/workflows/gap-tests.yml
+    with:
+      container: >-
+        ["master"]
+      suite: >-
+        ["testloadpackages"]
+      pkgs: >-
+        ["single", "singleonlyneeded", "all", "allreversed"]

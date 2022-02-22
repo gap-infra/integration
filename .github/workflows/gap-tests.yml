@@ -1,0 +1,40 @@
+name: "Run a GAP test suite"
+
+on:
+  workflow_call:
+    inputs:
+      container:
+        required: true
+        type: string
+      suite:
+        required: true
+        type: string
+      pkgs:
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: "${{ matrix.container }} / ${{ matrix.suite }} / ${{ matrix.pkgs }} packages"
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        container: ${{ fromJson(inputs.container) }}
+        suite:     ${{ fromJson(inputs.suite) }}
+        pkgs:      ${{ fromJson(inputs.pkgs) }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Get the Docker container URL"
+        id: container
+        run: echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ matrix.container }}:master"
+
+      - run: docker pull ${{ steps.container.outputs.url }}
+
+      - name: "Run GAP's ${{ matrix.suite }} test suite in the container with ${{ matrix.pkgs }} packages"
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ${{ steps.container.outputs.url }}
+          /bin/sh -c "TEST_SUITE=${{ matrix.suite }} GAPPKG=${{ matrix.pkgs }} /home/workspace/gap-tests.sh"
