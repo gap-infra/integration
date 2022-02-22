@@ -1,4 +1,4 @@
-name: "Test GAP" 
+name: "GAP test suites"
 
 on:
   workflow_dispatch:
@@ -6,14 +6,15 @@ on:
   push:
 
 jobs:
-  test:
+  testsuites:
     name: "GAP ${{ matrix.container }} / ${{ matrix.test-suite }} / ${{ matrix.pkgs }} packages"
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-18.04
+        container:
+          - master
+          - stable-4.11
         test-suite:
           - testinstall
           - testbugfix
@@ -22,24 +23,18 @@ jobs:
           - no
           - auto
           - all
-        container:
-          - master
-          - stable-4.11
 
     steps:
       - uses: actions/checkout@v2
 
       - name: "Constructing the full Docker container URL"
         id: container
-        run: |
-          echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ matrix.container }}:master"
+        run: echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ matrix.container }}:master"
 
       - name: "Pull the container ${{ steps.container.outputs.url }}"
-        run: |
-          docker version
-          docker pull ${{ steps.container.outputs.url }}
+        run: docker pull ${{ steps.container.outputs.url }}
 
-      - name: "Run GAP's ${{ matrix.test-suite }} test suite in the container"
+      - name: "Run GAP's ${{ matrix.test-suite }} test suite in the container with ${{ matrix.pkgs }} packages"
         run: |
-          docker run -v $PWD:/home/travis/gap ${{ steps.container.outputs.url }} /bin/sh -c "TEST_SUITE=${{ matrix.test-suite }} GAPPKG=${{ matrix.pkgs }} CONTAINER=${{ matrix.container }} /home/travis/gap/gap-ci.sh"
+          docker run -v $PWD:/home/workspace ${{ steps.container.outputs.url }} /bin/sh -c "TEST_SUITE=${{ matrix.test-suite }} GAPPKG=${{ matrix.pkgs }} CONTAINER=${{ matrix.container }} /home/workspace/gap-ci.sh"
           # retired variables: LANG=en_GB.UTF-8

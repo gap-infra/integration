@@ -1,44 +1,40 @@
 #!/usr/bin/env bash
 
-# running GAP tests suite
-
 set -ex
 
-SRCDIR=${SRCDIR:-$PWD}
 TERM=${TERM:-dumb}
 
 # --quitonbreak makes sure any Error() immediately exits GAP with exit code 1.
-GAP="bin/gap.sh --quitonbreak -q -A -x 80 -r -m 100m -o 1g -K 2g"
-GAPAuto="bin/gap.sh --quitonbreak -q -x 80 -r -m 100m -o 1g -K 2g"
+GAPauto="bin/gap.sh --quitonbreak -q -x 80 -r -m 200m -o 2g -K 4g"
+GAP="${GAPauto} -A"
 
-echo SRCDIR    : $SRCDIR
 echo TEST_SUITE: $TEST_SUITE
 echo GAPPKG    : $GAPPKG
 echo CONTAINER : $CONTAINER
 
+# FIXME: Perhaps containers should be installed in the same directory?
 cd /home/gap/inst/gap-${CONTAINER}/
 
 case $TEST_SUITE in
 
 testpackagesload)
 
+    cd pkg
+    # skip PolymakeInterface: no polymake installed (TODO: is there a polymake package we can use)
+    rm -rf PolymakeInterface*
+    # skip xgap: no X11 headers, and no means to test it
+    rm -rf xgap*
+    # also skip itc because it requires xgap
+    rm -rf itc*
+    cd ..
+
     case ${GAPPKG} in
     single|singleonlyneeded)
-
-        cd pkg
-        # skip PolymakeInterface: no polymake installed (TODO: is there a polymake package we can use)
-        rm -rf PolymakeInterface*
-        # skip xgap: no X11 headers, and no means to test it
-        rm -rf xgap*
-        # also skip itc because it requires xgap
-        rm -rf itc*
-        cd ..
 
         # loading each package in an individual GAP session, with all needed
         # and suggested packages, or only with needed packages
 
-        if [[ "$GAPPKG" = singleonlyneeded ]]
-        then
+        if [[ "$GAPPKG" = singleonlyneeded ]]; then
             GAPOPTION=":OnlyNeeded"
         else
             GAPOPTION=""
@@ -51,6 +47,7 @@ testpackagesload)
         PrintTo("packagenames", JoinStringsWithSeparator( SortedList(RecNames( GAPInfo.PackagesInfo )),"\n") );
         QUIT_GAP(0);
 GAPInput
+
         for pkg in $(cat packagenames)
         do
             $GAP -b -L testpackagesload.wsp <<GAPInput
@@ -62,11 +59,9 @@ GAPInput
               AppendTo("fail.log", "Loading failed : ", "$pkg", "\n");
             fi;
 GAPInput
-
         done
 
-        if [[ -f fail.log ]]
-        then
+        if [[ -f fail.log ]]; then
             echo "Some packages failed to load:"
             cat fail.log
             exit 1
@@ -75,19 +70,9 @@ GAPInput
 
     all|allreversed)
 
-        cd pkg
-        # skip PolymakeInterface: no polymake installed (TODO: is there a polymake package we can use)
-        rm -rf PolymakeInterface*
-        # skip xgap: no X11 headers, and no means to test it
-        rm -rf xgap*
-        # also skip itc because it requires xgap
-        rm -rf itc*
-        cd ..
-
         # Test of `LoadAllPackages()` and `LoadAllPackages(:reversed)`
 
-        if [[ "$GAPPKG" = allreversed ]]
-        then
+        if [[ "$GAPPKG" = allreversed ]]; then
             GAPOPTION=":reversed"
         else
             GAPOPTION=""
@@ -120,7 +105,7 @@ GAPInput
 GAPInput
     ;;
     auto)
-    $GAPAuto <<GAPInput
+    $GAPauto <<GAPInput
         TestDirectory( [ DirectoriesLibrary( "tst/${TEST_SUITE}" ) ], rec(exitGAP := true) );
         FORCE_QUIT_GAP(1);
 GAPInput
