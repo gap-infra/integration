@@ -1,4 +1,4 @@
-name: pkg-tests
+name: "Individual package tests"
 
 on:
   workflow_dispatch:

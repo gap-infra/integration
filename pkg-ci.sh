@@ -19,14 +19,14 @@ echo "######################################################################"
 echo ""
 cat dev/log/testpackage1*.${PKG_NAME}
 
-echo ""
-echo "######################################################################"
-echo "#"
-echo "# TEST WITH ALL PACKAGES LOADED (using LoadAllPackages() command)"
-echo "#"
-echo "######################################################################"
-echo ""
-cat dev/log/testpackage2*.${PKG_NAME}
+#echo ""
+#echo "######################################################################"
+#echo "#"
+#echo "# TEST WITH ALL PACKAGES LOADED (using LoadAllPackages() command)"
+#echo "#"
+#echo "######################################################################"
+#echo ""
+#cat dev/log/testpackage2*.${PKG_NAME}
 
 echo ""
 echo "######################################################################"
@@ -37,7 +37,7 @@ echo "######################################################################"
 echo ""
 cat dev/log/testpackageA*.${PKG_NAME}
 
-for TESTCASE in A 1 2
+for TESTCASE in A 1
 do
     export TESTRESULT=`cat dev/log/testpackage${TESTCASE}*.$PKG_NAME | grep -c "#I  No errors detected while testing"`
     if [ $TESTRESULT = '1' ]
@@ -86,11 +86,11 @@ echo "######################################################################"
 echo ""
 echo 'Package name                                         : ' $PKG_NAME 
 echo 'With no packages loaded (GAP started with -r option) : ' $PASS1
-echo 'With all packages loaded with LoadAllPackages()      : ' $PASS2
+#echo 'With all packages loaded with LoadAllPackages()      : ' $PASS2
 echo 'With default packages loaded at GAP startup          : ' $PASSA
 echo ""
 
-if [ "${PASS1}" != 'PASS' ] || [ "${PASS2}" != 'PASS' ] || [ "${PASSA}" != 'PASS' ]
+if [ "${PASS1}" != 'PASS' ] || [ "${PASSA}" != 'PASS' ]
 then
   echo "######################################################################\n"
   echo ""
