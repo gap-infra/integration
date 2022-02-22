@@ -8,12 +8,10 @@ on:
 jobs:
   test:
     name: GAP ${{ matrix.gap-container }} / ${{ matrix.pkg }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-18.04
         gap-container:
           - master
           - stable-4.11
