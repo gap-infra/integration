@@ -65,7 +65,7 @@ jobs:
           - grpconst
           - guarana
           - guava
-          - hap
+            #- hap TIMES OUT
           - hapcryst
           - hecke
           - help
@@ -102,7 +102,7 @@ jobs:
           - patternclass
           - permut
           - polenta
-          - polycyclic
+            #- polycyclic TIMES OUT
           - polymaking
           - primgrp
           - profiling
