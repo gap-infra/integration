@@ -25,7 +25,6 @@ jobs:
         container:
           - master
           - stable-4.11
-          - stable-4.10
 
     steps:
       - uses: actions/checkout@v2
