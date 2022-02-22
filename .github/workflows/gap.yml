@@ -43,4 +43,4 @@ jobs:
       - name: "Run GAP's ${{ matrix.test-suite }} test suite in the container"
         run: |
           docker run -v $PWD:/home/travis/gap ${{ steps.container.outputs.url }} /bin/sh -c "TEST_SUITE=${{ matrix.test-suite }} GAPPKG=${{ matrix.pkgs }} CONTAINER=${{ matrix.container }} /home/travis/gap/gap-ci.sh"
-          # retired variables: TERM=dumb LANG=en_GB.UTF-8
+          # retired variables: LANG=en_GB.UTF-8

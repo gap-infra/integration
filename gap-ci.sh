@@ -5,6 +5,7 @@
 set -ex
 
 SRCDIR=${SRCDIR:-$PWD}
+TERM=${TERM:-dumb}
 
 # --quitonbreak makes sure any Error() immediately exits GAP with exit code 1.
 GAP="bin/gap.sh --quitonbreak -q -A -x 80 -r -m 100m -o 1g -K 2g"
