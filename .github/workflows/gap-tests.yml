@@ -51,7 +51,7 @@ jobs:
             PKGS="[\"${{ github.event.inputs.pkgs }}\"]"
           fi
           echo "::set-output name=container::$CONTAINER"
-          echo "::set-output name=suite::$SUITE"
+          echo "::set-output name=suite::${{ inputs.container || [\"github.event.inputs.container\"]  }}"
           echo "::set-output name=pkgs::$PKGS"
 
   test:
@@ -61,8 +61,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        container: fromJson(${{ github.event.inputs.container || inputs.container }})
-        suite: fromJson(${{ github.event.inputs.suite || inputs.suite }})
+        container: ${{ fromJSON(needs.process.outputs.container) }}
+        suite: ${{ fromJSON(needs.process.outputs.suite) }}
         pkgs: ${{ fromJSON(needs.process.outputs.pkgs) }}
     steps:
       - uses: actions/checkout@v2
