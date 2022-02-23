@@ -1,0 +1,38 @@
+name: "Dev package tests"
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  extract:
+    name: "TODO"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: "TODO"
+        id: matrix
+        run: |
+          echo "::set-output name=matrix::$MATRIX"
+
+  package:
+    name: "${{ matrix.package }}"
+    needs: extract
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.extract.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: docker pull ghcr.io/gap-system/gap-docker-master:master
+
+      - name: "Run package (dev version) tests in GAP master Docker container"
+        timeout-minutes: 20
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ghcr.io/gap-system/gap-docker-master:master
+          /bin/sh -c "REPO_URL=${{ matrix.repo }} /home/workspace/dev-pkg.sh"
