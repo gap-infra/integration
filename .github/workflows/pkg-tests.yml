@@ -5,7 +5,7 @@ on:
     inputs:
       container:
         description: 'GHCR Docker image from gap-system'
-        required: false
+        required: true
         type: string
         default: gap-docker-master
       packages:
