@@ -1,0 +1,16 @@
+name: "Latest GAP release: make testspackagesload"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-tests:
+    name: "Latest GAP release"
+    runs-on: ubuntu-18.04
+    env:
+      container: ghcr.io/gap-system/gap-docker:master
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker pull ${{ env.container }}
+      - name: "Run make testpackagesload in latest GAP release"
+        run: docker run -v $PWD:/home/workspace ${{ env.container }} /bin/sh -c "/home/workspace/release-tests.sh"
