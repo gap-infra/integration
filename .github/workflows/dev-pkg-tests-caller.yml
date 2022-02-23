@@ -1,0 +1,11 @@
+name: "Dev package tests in GAP master"
+
+on:
+  #push:
+  #pull_request:
+  workflow_dispatch:
+
+jobs:
+  dev:
+    name: "GAP master"
+    uses: ./.github/workflows/dev-pkg-tests.yml

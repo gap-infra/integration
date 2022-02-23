@@ -1,4 +1,4 @@
-name: "Run a GAP test suite"
+name: "Run selected GAP test suites"
 
 on:
   workflow_call:

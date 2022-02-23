@@ -1,4 +1,4 @@
-name: "Dev package tests"
+name: "Run selected package tests"
 
 on:
   #push:
@@ -10,6 +10,7 @@ on:
         description: 'Packages to test (whitespace separated e.g. "digraphs semigroups"; leave blank to test all)'
         required: false
         type: string
+  workflow_call:
 
 jobs:
   extract:
