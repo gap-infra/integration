@@ -1,6 +1,17 @@
 name: "Run a package test suite"
 
 on:
+  workflow_dispatch:
+    inputs:
+      container:
+        description: 'GHCR Docker image from gap-system (default: gap-docker-master)'
+        required: false
+        type: string
+        default: gap-docker-master
+      package:
+        description: 'Individual package (leave blank to test all)'
+        required: false
+        type: string
   workflow_call:
     inputs:
       container:
@@ -9,24 +20,30 @@ on:
 
 jobs:
   extract:
-    name: "Get package names"
+    name: "Decide packages to test"
     runs-on: ubuntu-latest
-    container: ghcr.io/gap-system/${{ inputs.container }}:master
+    container: ghcr.io/gap-system/${{ github.event.inputs.container || inputs.container }}:master
     outputs:
       matrix: ${{ steps.get-names.outputs.matrix }}
-      container: ghcr.io/gap-system/${{ inputs.container }}:master
+      container: ghcr.io/gap-system/${{ github.event.inputs.container || inputs.container }}:master
     steps:
-      # FIXME: Awful! This should be completely redone to use the package distro
       - name: "Get the list of package names"
         id: get-names
         run: |
-          cd ${GAP_HOME}/pkg
-          MATRIX='{"package":['
-          for PKG in `ls */PackageInfo.g | cut -d'/' -f1 | cut -d'-' -f1 | tr '[:upper:]' '[:lower:]' | sort`; do
-            echo "${PKG}"
-            MATRIX="${MATRIX}\"${PKG}\","
-          done
-          MATRIX="${MATRIX}]}"
+          # Assume that every subdir of ${GAP_HOME}/pkg containing a PackageInfo.g
+          # file holds the name of a package to test
+          if [[ ${GITHUB_EVENT_NAME} == "workflow_call" || "${{ github.event.inputs.package }}" == ""]]; then
+            cd ${GAP_HOME}/pkg
+            MATRIX='{"package":['
+            #
+            for PKG in `ls */PackageInfo.g | cut -d'/' -f1 | cut -d'-' -f1 | tr '[:upper:]' '[:lower:]' | sort`; do
+              echo "${PKG}"
+              MATRIX="${MATRIX}\"${PKG}\","
+            done
+            MATRIX="${MATRIX}]}"
+          else
+            MATRIX='{"package":["${{ github.event.inputs.package }}"]}'
+          fi
           echo "::set-output name=matrix::$MATRIX"
 
   individual-package:
