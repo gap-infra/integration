@@ -20,7 +20,7 @@ on:
 
 jobs:
   extract:
-    name: "Decide packages to test"
+    name: "Decide packages to test in ${{ github.event.inputs.container || inputs.container }}"
     runs-on: ubuntu-latest
     container: ghcr.io/gap-system/${{ github.event.inputs.container || inputs.container }}:master
     outputs:
@@ -30,7 +30,7 @@ jobs:
       - name: "Get the list of package names"
         id: get-names
         run: |
-          if [ "${GITHUB_EVENT_NAME}" == "workflow_call" ] || [ "digraphs semigroups" == "" ]; then
+          if [ "${{ github.event_name }}" = "workflow_call" ] || [ "digraphs semigroups" = "" ]; then
             # Assume that every subdir of ${GAP_HOME}/pkg containing a
             # PackageInfo.g file holds the name of a package to test
             cd ${GAP_HOME}/pkg
