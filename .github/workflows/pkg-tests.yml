@@ -11,10 +11,10 @@ jobs:
   extract:
     name: "Get package names"
     runs-on: ubuntu-latest
-    container: ghcr.io/${{ inputs.container }}:master
+    container: ghcr.io/gap-system/${{ inputs.container }}:master
     outputs:
       matrix: ${{ steps.get-names.outputs.matrix }}
-      container: ghcr.io/${{ inputs.container }}:master
+      container: ghcr.io/gap-system/${{ inputs.container }}:master
     steps:
       # FIXME: Awful! This should be completely redone to use the package distro
       - name: "Get the list of package names"
