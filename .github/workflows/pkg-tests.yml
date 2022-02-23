@@ -59,10 +59,18 @@ jobs:
 
       - run: docker pull ${{ needs.extract.outputs.container }}
 
-      - name: "Run ${{ matrix.package }} package tests in ${{ needs.extract.outputs.container }}"
+      - name: "Run package tests with default packages loaded"
         timeout-minutes: 20
         run: >
           docker run
           -v $PWD:/home/workspace
           ${{ needs.extract.outputs.container }}
           /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh"
+
+      - name: "Run package tests with minimal packages loaded"
+        timeout-minutes: 20
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ${{ needs.extract.outputs.container }}
+          /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh -A"
