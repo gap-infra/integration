@@ -43,7 +43,7 @@ jobs:
       - run: docker pull ghcr.io/gap-system/gap-docker-master:master
 
       - name: "Run package (dev version) tests in GAP master Docker container"
-        timeout-minutes: 20
+        timeout-minutes: 40
         run: >
           docker run
           -v $PWD:/home/workspace
