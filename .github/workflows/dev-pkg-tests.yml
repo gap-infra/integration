@@ -1,24 +1,36 @@
 name: "Dev package tests"
 
 on:
-  push:
-  pull_request:
+  #push:
+  #pull_request:
   workflow_dispatch:
+    inputs:
+      # TODO Support providing a repo URL directly
+      packages:
+        description: 'Packages to test (whitespace separated e.g. "digraphs semigroups"; leave blank to test all)'
+        required: false
+        type: string
 
 jobs:
   extract:
-    name: "TODO"
+    name: "Assemble repository URLs to test"
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
-      - name: "TODO"
+      - uses: actions/checkout@v2
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+      - name: "Install Python modules"
+        run: pip3 install BeautifulSoup4
+      - name: "Get current dev repos"
         id: matrix
         run: |
-          echo "::set-output name=matrix::$MATRIX"
+          JSON=`python3 get-repos.py ${{ github.event.inputs.packages }}`
+          echo "::set-output name=matrix::${JSON}"
 
   package:
-    name: "${{ matrix.package }}"
+    name: "${{ matrix.pkg_name }}"
     needs: extract
     runs-on: ubuntu-18.04
     strategy:
@@ -35,4 +47,4 @@ jobs:
           docker run
           -v $PWD:/home/workspace
           ghcr.io/gap-system/gap-docker-master:master
-          /bin/sh -c "REPO_URL=${{ matrix.repo }} /home/workspace/dev-pkg.sh"
+          /bin/sh -c "PKG_NAME=${{ matrix.pkg_name }} REPO_URL=${{ matrix.repo_url }} /home/workspace/dev-pkg.sh"

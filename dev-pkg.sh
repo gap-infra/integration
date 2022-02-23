@@ -7,21 +7,19 @@ set -e
 TERM=${TERM:-xterm}
 
 SRCDIR=$PWD
-# The following assumes that REPO_URL looks like this: https://provider.com/username/packagename.git
-PKGDIR="$(basename ${REPO_URL} .git)"
 
 echo SRCDIR   : $SRCDIR
+echo PKG_NAME : $PKG_NAME
 echo REPO_URL : $REPO_URL
-echo PKGDIR   : $PKGDIR
 
 # set up a custom GAP root containing only this package, so that
 # we can force GAP to load the correct version of this package
 mkdir -p gaproot/pkg/
 cd gaproot/pkg/
 
-git clone ${REPO_URL}
+git clone ${REPO_URL} ${PKG_NAME}
 
-cd ${PKGDIR}
+cd ${PKG_NAME}
 
 # show head commit for debugging
 git log -n 1
@@ -37,8 +35,8 @@ fi
 
 # build the package
 cd ..
-${GAP_HOME}/bin/BuildPackages.sh --with-gaproot=${GAP_HOME} --strict ${PKGDIR}
-cd ${PKGDIR}
+${GAP_HOME}/bin/BuildPackages.sh --with-gaproot=${GAP_HOME} --strict ${PKG_NAME}
+cd ${PKG_NAME}
 
 
 ###############################################################################
@@ -54,7 +52,7 @@ echo "#"
 echo "######################################################################"
 echo ""
 $GAP -A <<GAPInput
-Read("/home/gap/travis/dev-pkg.g");
+Read("/home/workspace/dev-pkg.g");
 SetInfoLevel(InfoPackageLoading,4);
 pkg := PreparePackageInDir("${PWD}");;
 if LoadPackage(pkg) <> true then
@@ -72,7 +70,7 @@ echo "#"
 echo "######################################################################"
 echo ""
 $GAP <<GAPInput
-Read("/home/gap/travis/dev-pkg.g");
+Read("/home/workspace/dev-pkg.g");
 pkg := PreparePackageInDir("${PWD}");;
 if TestOnePackage(pkg) <> true then
     FORCE_QUIT_GAP(1);
@@ -88,7 +86,7 @@ echo "#"
 echo "######################################################################"
 echo ""
 $GAP -A <<GAPInput
-Read("/home/gap/travis/dev-pkg.g");
+Read("/home/workspace/dev-pkg.g");
 pkg := PreparePackageInDir("${PWD}");;
 if TestOnePackage(pkg) <> true then
     FORCE_QUIT_GAP(1);
@@ -104,7 +102,7 @@ echo "#"
 echo "######################################################################"
 echo ""
 $GAP <<GAPInput
-Read("/home/gap/travis/dev-pkg.g");
+Read("/home/workspace/dev-pkg.g");
 pkg := PreparePackageInDir("${PWD}");;
 LoadAllPackages();
 if TestOnePackage(pkg) <> true then
