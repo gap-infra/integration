@@ -10,4 +10,4 @@ jobs:
     name: "GAP stable-4.11"
     uses: ./.github/workflows/pkg-tests.yml
     with:
-      container: stable-4.11 
+      container: gap-docker-stable-4.11

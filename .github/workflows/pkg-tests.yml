@@ -11,10 +11,10 @@ jobs:
   extract:
     name: "Get package names"
     runs-on: ubuntu-latest
-    container: ghcr.io/gap-system/gap-docker-${{ inputs.container }}:master
+    container: ghcr.io/${{ inputs.container }}:master
     outputs:
       matrix: ${{ steps.get-names.outputs.matrix }}
-      container: ${{ inputs.container }}
+      container: ghcr.io/${{ inputs.container }}:master
     steps:
       # FIXME: Awful! This should be completely redone to use the package distro
       - name: "Get the list of package names"
@@ -39,16 +39,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Get the Docker container URL"
-        id: container
-        run: echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ needs.extract.outputs.container }}:master"
+      - run: docker pull ${{ needs.extract.outputs.container }}
 
-      - run: docker pull ${{ steps.container.outputs.url }}
-
-      - name: "Run ${{ matrix.package }}'s tests in the container with GAP ${{ needs.extract.outputs.container }}"
+      - name: "Run ${{ matrix.package }}'s tests in ${{ needs.extract.outputs.container }}"
         timeout-minutes: 20
         run: >
           docker run
           -v $PWD:/home/workspace
-          ${{ steps.container.outputs.url }}
+          ${{ needs.extract.outputs.container }}
           /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh"

@@ -14,3 +14,9 @@ jobs:
       - run: docker pull ${{ env.container }}
       - name: "Run make testpackagesload in latest GAP release"
         run: docker run -v $PWD:/home/workspace ${{ env.container }} /bin/sh -c "/home/workspace/release-tests.sh"
+
+  pkg:
+    name: "GAP latest"
+    uses: ./.github/workflows/pkg-tests.yml
+    with:
+      container: gap-docker
