@@ -42,17 +42,15 @@ jobs:
         id: process
         run: |
           if [ ${GITHUB_EVENT_NAME} == "workflow_call" ]; then
-            CONTAINER=${{ inputs.container }}
-            SUITE=${{ inputs.suite }}
-            PKGS=${{ inputs.pkgs }}
+            echo "::set-output name=container::${{ inputs.container }}"
+            echo "::set-output name=suite::${{ inputs.suite }}"
+            echo "::set-output name=pkgs::${{ inputs.pkgs }}"
           else
-            CONTAINER="[\"${{ github.event.inputs.container }}\"]"
-            SUITE="[\"${{ github.event.inputs.suite }}\"]"
-            PKGS="[\"${{ github.event.inputs.pkgs }}\"]"
+            # TODO: Accept a whitespace separated list as each input
+            echo "::set-output name=container::[\"${{ github.event.inputs.container }}\"]"
+            echo "::set-output name=suite::[\"${{ github.event.inputs.suite }}\"]"
+            echo "::set-output name=pkgs::[\"${{ github.event.inputs.pkgs }}\"]"
           fi
-          echo "::set-output name=container::$CONTAINER"
-          echo "::set-output name=suite::${{ inputs.container || [\"github.event.inputs.container\"]  }}"
-          echo "::set-output name=pkgs::$PKGS"
 
   test:
     needs: process
