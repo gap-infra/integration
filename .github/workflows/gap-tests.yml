@@ -1,22 +1,6 @@
 name: "Run a GAP test suite"
 
 on:
-  workflow_dispatch:
-    inputs:
-      container:
-        description: 'GHCR Docker image from gap-system'
-        required: true
-        type: string
-        default: gap-docker-master
-      suite:
-        required: true
-        type: string
-        default: testinstall
-      pkgs:
-        required: true
-        type: string
-        default: auto
-
   workflow_call:
     inputs:
       container:
@@ -30,46 +14,27 @@ on:
         type: string
 
 jobs:
-  process:
-    name: "Process jobs to run"
-    runs-on: ubuntu-18.04
-    outputs:
-      container: ${{ steps.process.outputs.matrix }}
-      suite: ${{ steps.process.outputs.suite }}
-      pkgs: ${{ steps.process.outputs.pkgs }}
-    steps:
-      - name: "Assemble job matrix"
-        id: process
-        run: |
-          if [ ${GITHUB_EVENT_NAME} == "workflow_call" ]; then
-            echo "::set-output name=container::${{ inputs.container }}"
-            echo "::set-output name=suite::${{ inputs.suite }}"
-            echo "::set-output name=pkgs::${{ inputs.pkgs }}"
-          else
-            # TODO: Accept a whitespace separated list as each input
-            echo "::set-output name=container::[\"${{ github.event.inputs.container }}\"]"
-            echo "::set-output name=suite::[\"${{ github.event.inputs.suite }}\"]"
-            echo "::set-output name=pkgs::[\"${{ github.event.inputs.pkgs }}\"]"
-          fi
-
   test:
-    needs: process
     name: "${{ matrix.container }} / ${{ matrix.suite }} / ${{ matrix.pkgs }} packages"
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        container: ${{ fromJSON(needs.process.outputs.container) }}
-        suite: ${{ fromJSON(needs.process.outputs.suite) }}
-        pkgs: ${{ fromJSON(needs.process.outputs.pkgs) }}
+        container: ${{ fromJson(inputs.container) }}
+        suite:     ${{ fromJson(inputs.suite) }}
+        pkgs:      ${{ fromJson(inputs.pkgs) }}
     steps:
       - uses: actions/checkout@v2
 
-      - run: docker pull ghcr.io/gap-system/${{ matrix.container }}:master
+      - name: "Get the Docker container URL"
+        id: container
+        run: echo "::set-output name=url::ghcr.io/gap-system/gap-docker-${{ matrix.container }}:master"
 
-      - name: "Run GAP's ${{ matrix.suite }} test suite with ${{ matrix.pkgs }} packages"
+      - run: docker pull ${{ steps.container.outputs.url }}
+
+      - name: "Run GAP's ${{ matrix.suite }} test suite in the container with ${{ matrix.pkgs }} packages"
         run: >
           docker run
           -v $PWD:/home/workspace
-          ghcr.io/gap-system/${{ matrix.container }}:master
+          ${{ steps.container.outputs.url }}
           /bin/sh -c "TEST_SUITE=${{ matrix.suite }} GAPPKG=${{ matrix.pkgs }} /home/workspace/gap-tests.sh"
