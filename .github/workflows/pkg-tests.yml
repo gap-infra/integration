@@ -30,7 +30,7 @@ jobs:
       - name: "Get the list of package names"
         id: get-names
         run: |
-          if [ ${GITHUB_EVENT_NAME} == "workflow_call" ] || [ "${{ github.event.inputs.packages }}" == ""]; then
+          if [ "${GITHUB_EVENT_NAME}" == "workflow_call" ] || [ "digraphs semigroups" == "" ]; then
             # Assume that every subdir of ${GAP_HOME}/pkg containing a
             # PackageInfo.g file holds the name of a package to test
             cd ${GAP_HOME}/pkg
