@@ -30,18 +30,19 @@ jobs:
       - name: "Get the list of package names"
         id: get-names
         run: |
-          # Assume that every subdir of ${GAP_HOME}/pkg containing a PackageInfo.g
-          # file holds the name of a package to test
           if [[ ${GITHUB_EVENT_NAME} == "workflow_call" || "${{ github.event.inputs.package }}" == ""]]; then
+            # Assume that every subdir of ${GAP_HOME}/pkg containing a
+            # PackageInfo.g file holds the name of a package to test
             cd ${GAP_HOME}/pkg
             MATRIX='{"package":['
-            #
+            # Get each dir, get name: the string before the first /, and before the first -, and make lowercase
             for PKG in `ls */PackageInfo.g | cut -d'/' -f1 | cut -d'-' -f1 | tr '[:upper:]' '[:lower:]' | sort`; do
               echo "${PKG}"
               MATRIX="${MATRIX}\"${PKG}\","
             done
             MATRIX="${MATRIX}]}"
           else
+            # FIXME: No need to run this case inside the Docker container
             MATRIX='{"package":["${{ github.event.inputs.package }}"]}'
           fi
           echo "::set-output name=matrix::$MATRIX"
