@@ -1,4 +1,4 @@
-name: "Run a package test suite"
+name: "Run package test suites"
 
 on:
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
       - name: "Get the list of package names"
         id: get-names
         run: |
-          if [ ${GITHUB_EVENT_NAME} == "workflow_call" || "${{ github.event.inputs.packages }}" == ""]; then
+          if [ ${GITHUB_EVENT_NAME} == "workflow_call" ] || [ "${{ github.event.inputs.packages }}" == ""]; then
             # Assume that every subdir of ${GAP_HOME}/pkg containing a
             # PackageInfo.g file holds the name of a package to test
             cd ${GAP_HOME}/pkg
@@ -59,7 +59,7 @@ jobs:
 
       - run: docker pull ${{ needs.extract.outputs.container }}
 
-      - name: "Run ${{ matrix.package }}'s tests in ${{ needs.extract.outputs.container }}"
+      - name: "Run ${{ matrix.package }} package tests in ${{ needs.extract.outputs.container }}"
         timeout-minutes: 20
         run: >
           docker run
