@@ -1,11 +1,11 @@
-name: "Latest GAP release: make testspackagesload"
+name: "Latest GAP release"
 
 on:
   workflow_dispatch:
 
 jobs:
-  release-tests:
-    name: "Latest GAP release"
+  testpackagesload:
+    name: "make testpackagesload"
     runs-on: ubuntu-18.04
     env:
       container: ghcr.io/gap-system/gap-docker:master
