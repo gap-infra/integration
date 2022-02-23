@@ -1,8 +1,8 @@
 name: "GAP stable-4.11 test suites"
 
 on:
-  push:
-  pull_request:
+  #push:
+  #pull_request:
   workflow_dispatch:
 
 jobs:

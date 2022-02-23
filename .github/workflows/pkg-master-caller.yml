@@ -1,8 +1,8 @@
 name: "Package tests in GAP master"
 
 on:
-  push:
-  pull_request:
+  #push:
+  #pull_request:
   workflow_dispatch:
 
 jobs:
