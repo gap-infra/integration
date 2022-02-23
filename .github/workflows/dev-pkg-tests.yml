@@ -1,4 +1,4 @@
-name: "Run selected package tests"
+name: "Run selected dev package tests"
 
 on:
   #push:
