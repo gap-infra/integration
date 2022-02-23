@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/gap-tests.yml
     with:
       container: >-
-        ["stable-4.11"]
+        ["gap-docker-stable-4.11"]
       suite: >-
         ["testinstall", "testbugfix", "teststandard"]
       pkgs: >-
@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/gap-tests.yml
     with:
       container: >-
-        ["stable-4.11"]
+        ["gap-docker-stable-4.11"]
       suite: >-
         ["testloadpackages"]
       pkgs: >-

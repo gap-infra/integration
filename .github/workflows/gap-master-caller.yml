@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/gap-tests.yml
     with:
       container: >-
-        ["master"]
+        ["gap-docker-master"]
       suite: >-
         ["testinstall", "testbugfix", "teststandard"]
       pkgs: >-
@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/gap-tests.yml
     with:
       container: >-
-        ["master"]
+        ["gap-docker-master"]
       suite: >-
         ["testloadpackages"]
       pkgs: >-
