@@ -31,11 +31,14 @@ jobs:
         id: get-names
         run: |
           if [ "${{ github.event.inputs.packages }}" = "" ]; then
-            # Assume that every subdir of ${GAP_HOME}/pkg containing a
-            # PackageInfo.g file holds the name of a package to test
-            cd ${GAP_HOME}/pkg
-            # Get each dir, get name: the string before the first /, and before the first -, and make lowercase
-            PACKAGES=`ls */PackageInfo.g | cut -d'/' -f1 | cut -d'-' -f1 | tr '[:upper:]' '[:lower:]' | sort`
+            # Get the names of all packages with a TestFile in their PackageInfo
+            # record, in lowercase
+            PACKAGES=$(${GAP_HOME}/bin/gap.sh -A -b -q --quitonbreak <<EOF
+            pis:=GAPInfo.PackagesInfo;;
+            pkgs:=Filtered(RecNames(pis), x->IsBound(pis.(x)[1].TestFile));;
+            for pkgname in SortedList(pkgs) do Print(pkgname,"\n"); od;
+          EOF
+            )
           else
             PACKAGES="${{ github.event.inputs.packages }}"
           fi
