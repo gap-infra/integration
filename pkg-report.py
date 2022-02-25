@@ -11,13 +11,14 @@ from datetime import datetime
 if sys.version_info < (3,6):
     error('Python 3.6 or newer is required')
 
-if len(sys.argv) != 5:
+if len(sys.argv) != 6:
     error('Unknown number of arguments')
 
 runID = sys.argv[1]
 docker = sys.argv[2]
-hash = sys.argv[3]
-branch = sys.argv[4]
+version = sys.argv[3]
+hash = sys.argv[4]
+branch = sys.argv[5]
 
 REPO = 'https://github.com/FriedrichRober/integration'
 
@@ -31,9 +32,11 @@ FILES.sort()
 PKG_STATUS = {}
 
 for FILE in FILES:
-    PKG_STATUS[os.path.splitext(os.path.basename(FILE))[0]] = open(FILE).read().rstrip()
+    PKG_STATUS[os.path.splitext(os.path.basename(FILE))[0]] = open(FILE, 'r').read().rstrip()
 
 REPORT = {}
+REPORT['docker_container'] = docker
+REPORT['gap_build_version'] = version
 REPORT['workflow'] = REPO+'/actions/runs/'+runID
 REPORT['date'] = str(datetime.now())
 REPORT['pkgs'] = PKG_STATUS
