@@ -90,7 +90,7 @@ jobs:
 
       - name: "Get job status"
         id: job-status
-        if: always()
+        if: ${{ always() }}
         run: |
           PKG="${{ matrix.package }}"
           STATUS="${{ job.status }}"
@@ -98,7 +98,7 @@ jobs:
 
       - name: "Upload job status"
         uses: actions/upload-artifact@v2
-        if: always()
+        if: ${{ always() }}
         with:
           name: ${{ matrix.package }}
           path: "${{ matrix.package }}.txt"
@@ -106,7 +106,7 @@ jobs:
   report:
     name: "Report"
     needs: individual-package
-    if: always()
+    if: ${{ always() }}
     runs-on: ubuntu-18.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
