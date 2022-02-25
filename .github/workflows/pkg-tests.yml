@@ -77,3 +77,65 @@ jobs:
           -v $PWD:/home/workspace
           ${{ needs.extract.outputs.container }}
           /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh -A"
+
+      - name: "Get job status"
+        id: job-status
+        if: always()
+        run: |
+          PKG="${{ matrix.package }}"
+          STATUS="${{ job.status }}"
+          echo ${STATUS} > "${PKG}.txt"
+
+      - name: "Upload job status"
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: ${{ matrix.package }}
+          path: "${{ matrix.package }}.txt"
+
+  report:
+    name: "Report"
+    needs: individual-package
+    if: always()
+    runs-on: ubuntu-18.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Create data and gh-pages worktree"
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
+          git fetch
+          git branch --track data origin/data
+          git worktree add data origin/data
+          git branch --track gh-pages origin/gh-pages
+          git worktree add gh-pages origin/gh-pages
+      - name: "Download every job status"
+        uses: actions/download-artifact@v2
+        with:
+          path: reports
+
+      - name: "Set up Python 3.7"
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: "Generate report"
+        id: report
+        run: python pkg-report.py ${{ github.run_id }} ${{inputs.container}} $(git rev-parse --short "$GITHUB_SHA") ${GITHUB_REF#refs/heads/}
+
+      - name: "Push everythijng"
+        id: push-report
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cd data
+          git add -A
+          git commit -m "Automated report"
+          git push origin HEAD:data
+          cd ../gh-pages
+          git add -A
+          git commit -m "Update redirect"
+          git push origin HEAD:gh-pages
