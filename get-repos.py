@@ -31,10 +31,10 @@ for anchor in anchors:
             and not "gap-packages.github.io" in pkg_name.lower():
         repos.append(
             {
-                "pkg_name": anchor.get_text(), \
+                "package": anchor.get_text(), \
                 "repo_url": match.group(0)
             }
         )
 
-matrix = {"include": sorted(repos, key=lambda r: r["pkg_name"].lower())}
+matrix = {"include": sorted(repos, key=lambda r: r["package"].lower())}
 print(json.dumps(matrix))
