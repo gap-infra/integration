@@ -25,7 +25,10 @@ repos = []
 for anchor in anchors:
     match = pattern.match(anchor.get("href"))
     pkg_name = anchor.get_text()
-    if (not args or pkg_name.lower() in args) and not pkg_name.lower() in avoid and match:
+    if match \
+            and (not args or pkg_name.lower() in args) \
+            and not pkg_name.lower() in avoid \
+            and not "gap-packages.github.io" in pkg_name.lower():
         repos.append(
             {
                 "pkg_name": anchor.get_text(), \
