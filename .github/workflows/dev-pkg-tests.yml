@@ -28,11 +28,16 @@ jobs:
         id: matrix
         run: |
           JSON=`python3 get-repos.py ${{ github.event.inputs.packages }}`
+          if [ "$JSON" = "{\"include\": []}" ]; then
+            echo "No matching repositories found"
+            exit 42
+          fi
           echo "::set-output name=matrix::${JSON}"
 
   package:
     name: "${{ matrix.pkg_name }}"
     needs: extract
+    #if: ${{ needs.extract.outputs.matrix != '{"include": []}' }}
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
