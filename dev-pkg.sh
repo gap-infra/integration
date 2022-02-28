@@ -6,6 +6,9 @@ set -e
 
 TERM=${TERM:-xterm}
 
+SRCDIR=$PWD
+
+echo SRCDIR   : $SRCDIR
 echo PKG_NAME : $PKG_NAME
 echo REPO_URL : $REPO_URL
 
@@ -33,3 +36,13 @@ fi
 # build the package
 cd ..
 ${GAP_HOME}/bin/BuildPackages.sh --with-gaproot=${GAP_HOME} --strict ${PKG_NAME}
+
+# TODO: Skip trying to test packages without tests
+# TODO: Validate PackageInfo.g? (see dev-pkg.g?)
+# TODO: These tests should ideally take place within separate CI steps
+
+# Test with default packages
+${GAP_HOME}/bin/gap.sh -l $SRCDIR/gaproot; --quitonbreak -r /home/workspace/pkg-tests.g
+
+# Test with minimal packages
+${GAP_HOME}/bin/gap.sh -l $SRCDIR/gaproot; --quitonbreak -r -A /home/workspace/pkg-tests.g
