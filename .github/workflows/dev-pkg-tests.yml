@@ -54,3 +54,19 @@ jobs:
           -v $PWD:/home/workspace
           ghcr.io/gap-system/gap-docker-master:master
           /bin/sh -c "PKG_NAME=${{ matrix.package }} REPO_URL=${{ matrix.repo_url }} /home/workspace/dev-pkg.sh"
+
+      - name: "Run package tests with default packages loaded"
+        timeout-minutes: 20
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ghcr.io/gap-system/gap-docker-master:master
+          /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh"
+
+      - name: "Run package tests with minimal packages loaded"
+        timeout-minutes: 20
+        run: >
+          docker run
+          -v $PWD:/home/workspace
+          ghcr.io/gap-system/gap-docker-master:master
+          /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh -A"
