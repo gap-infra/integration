@@ -1,12 +1,10 @@
 name: "GAP master test suites"
 
 on:
-  #push:
-  #pull_request:
   workflow_dispatch:
   schedule:
-    # Every day at 2:15 AM UTC
-    - cron: '15 2 * * *'
+    # Every Monday at 2:15 AM UTC
+    - cron: '15 2 * * 1'
 
 jobs:
   install-bugfix-standard:

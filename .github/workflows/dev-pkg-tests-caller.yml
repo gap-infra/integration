@@ -1,12 +1,10 @@
 name: "Dev package tests in GAP master"
 
 on:
-  #push:
-  #pull_request:
   workflow_dispatch:
   schedule:
-    # Every day at 4:15 AM UTC
-    - cron: '15 4 * * *'
+    # Every Monday at 4:15 AM UTC
+    - cron: '15 4 * * 1'
 
 jobs:
   dev:
