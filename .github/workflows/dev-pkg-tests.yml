@@ -55,6 +55,8 @@ jobs:
           ghcr.io/gap-system/gap-docker-master:master
           /bin/sh -c "PKG_NAME=${{ matrix.package }} REPO_URL=${{ matrix.repo_url }} /home/workspace/dev-pkg.sh"
 
+      # TODO: Skip trying to test packages without tests
+
       - name: "Run package tests with default packages loaded"
         timeout-minutes: 20
         run: >

@@ -15,8 +15,9 @@ anchors = page.find_all("a")
 
 # Regex pattern for repositories
 # * Accommodate possible http versus https; possible trailing /)
+# * URL must contain "git": e.g. GitHub or GitLab
 # * Catch organisation and repository name as groups
-pattern = re.compile("https?://[^/]+/([^/]*)/([^/]*)/?")
+pattern = re.compile("https?://[^/]*git[^/]+/([^/]*)/([^/]*)/?$")
 
 # TODO: Populate a list of packages to remove, perhaps dynamically
 avoid = ["homepage", "itc"]
