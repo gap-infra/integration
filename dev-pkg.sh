@@ -41,8 +41,10 @@ ${GAP_HOME}/bin/BuildPackages.sh --with-gaproot=${GAP_HOME} --strict ${PKG_NAME}
 # TODO: Validate PackageInfo.g? (see dev-pkg.g?)
 # TODO: These tests should ideally take place within separate CI steps
 
+GAP="${GAP_HOME}/bin/gap.sh -l ${SRCDIR}/gaproot; --quitonbreak -r"
+
 # Test with default packages
-${GAP_HOME}/bin/gap.sh -l $SRCDIR/gaproot; --quitonbreak -r /home/workspace/pkg-tests.g
+$GAP /home/workspace/pkg-tests.g
 
 # Test with minimal packages
-${GAP_HOME}/bin/gap.sh -l $SRCDIR/gaproot; --quitonbreak -r -A /home/workspace/pkg-tests.g
+$GAP -A /home/workspace/pkg-tests.g
