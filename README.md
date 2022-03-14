@@ -7,6 +7,8 @@ To some degree, the tests in this repository should help us detect:
 * Has a package broken GAP?
 * Has one package broken itself or another package? (Somewhat).
 
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/FriedrichRober/integration/data/badges/badge.json)](https://github.com/FriedrichRober/integration/actions/workflows/pkg-master-caller.yml) [Report is here](https://friedrichrober.github.io/integration/)
+
 The tests of whether GAP has broken itself currently exist in the main [gap-system/gap](https://github.com/gap-system/gap) repository.
 
 

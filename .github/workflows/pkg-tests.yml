@@ -26,7 +26,14 @@ jobs:
     outputs:
       matrix: ${{ steps.get-names.outputs.matrix }}
       container: ghcr.io/gap-system/${{ github.event.inputs.container || inputs.container }}:master
+      gap_build_version: ${{steps.get-build-version.outputs.version}}
     steps:
+      - name: "Extract GAP_BUILD_VERSION"
+        id: get-build-version
+        run: |
+          VERSION=$(awk '/GAP_BUILD_VERSION=/{ print $0 }' ${GAP_HOME}/sysinfo.gap | awk -F 'GAP_BUILD_VERSION="' '{print $2}' | awk -F '\"' '{print $1}')
+          echo "::set-output name=version::$VERSION"
+
       - name: "Get the list of package names"
         id: get-names
         run: |
@@ -57,6 +64,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.extract.outputs.matrix) }}
+    outputs:
+      container : ${{needs.extract.outputs.container}}
+      gap_build_version: ${{needs.extract.outputs.gap_build_version}}
     steps:
       - uses: actions/checkout@v2
 
@@ -77,3 +87,68 @@ jobs:
           -v $PWD:/home/workspace
           ${{ needs.extract.outputs.container }}
           /bin/sh -c "PKG_NAME=${{ matrix.package }} /home/workspace/pkg-tests.sh -A"
+
+      - name: "Get job status"
+        id: job-status
+        if: ${{ always() }}
+        run: |
+          PKG="${{ matrix.package }}"
+          STATUS="${{ job.status }}"
+          echo ${STATUS} > "${PKG}.txt"
+
+      - name: "Upload job status"
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: ${{ matrix.package }}
+          path: "${{ matrix.package }}.txt"
+
+  report:
+    name: "Report"
+    needs: individual-package
+    if: ${{ always() }}
+    runs-on: ubuntu-18.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      CONTAINER: ${{ needs.individual-package.outputs.container }}
+      VERSION: ${{ needs.individual-package.outputs.gap_build_version }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Create data and gh-pages worktree"
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
+          git fetch
+          git branch --track data origin/data
+          git worktree add data origin/data
+          git branch --track gh-pages origin/gh-pages
+          git worktree add gh-pages origin/gh-pages
+
+      - name: "Download every job status"
+        uses: actions/download-artifact@v2
+        with:
+          path: reports
+
+      - name: "Set up Python 3.7"
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: "Generate report"
+        id: report
+        run: python pkg-report.py ${{ github.run_id }} ${CONTAINER} ${VERSION} $(git rev-parse --short "$GITHUB_SHA") ${GITHUB_REF#refs/heads/}
+
+      - name: "Push report"
+        id: push-report
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cd data
+          git add -A
+          git commit -m "Automated report"
+          git push origin HEAD:data
+          cd ../gh-pages
+          git add -A
+          git commit -m "Update redirect"
+          git push origin HEAD:gh-pages
